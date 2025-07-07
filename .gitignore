@@ -12,3 +12,4 @@ venv
 .env.production.local
 .DS_Store
 .vscode
+*.sh
