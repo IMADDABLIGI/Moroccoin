@@ -4,8 +4,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@moroccoin.com')
+  const [password, setPassword] = useState('admin123')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -16,15 +16,13 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
-    const result = await login(email, password)
     
+    const result = await login(email, password)
     if (result.success) {
       navigate('/')
     } else {
       setError(result.error)
     }
-    
     setLoading(false)
   }
 
@@ -38,14 +36,12 @@ export default function Login() {
             Sign in to access the admin panel
           </p>
         </div>
-        
         <form className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-lg" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
-          
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email address
@@ -61,7 +57,6 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
@@ -90,7 +85,6 @@ export default function Login() {
               </button>
             </div>
           </div>
-
           <div>
             <button
               type="submit"
@@ -100,7 +94,6 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-
           <div className="text-center text-sm text-gray-600">
             <p>Demo credentials:</p>
             <p>Email: admin@moroccoin.com</p>

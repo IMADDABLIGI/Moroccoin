@@ -96,14 +96,12 @@ export default function Layout({ children }) {
           >
             <Menu className="h-6 w-6" />
           </button>
-
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <button className="p-2 text-gray-400 hover:text-gray-500">
                 <Bell className="h-6 w-6" />
               </button>
-              
               <div className="flex items-center gap-x-4">
                 <div className="text-sm font-medium text-gray-900">{user?.name}</div>
                 <button
@@ -117,7 +115,6 @@ export default function Layout({ children }) {
             </div>
           </div>
         </div>
-
         {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

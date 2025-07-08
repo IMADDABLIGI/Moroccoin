@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { authAPI } from '../services/api'
 
 const AuthContext = createContext()
 
@@ -16,28 +17,34 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in (check localStorage or make API call)
     const token = localStorage.getItem('token')
     if (token) {
-      setIsAuthenticated(true)
-      setUser({ name: 'Admin User', email: 'admin@moroccoin.com' })
+      authAPI.getProfile()
+        .then(response => {
+          setIsAuthenticated(true)
+          setUser(response.data)
+        })
+        .catch(() => {
+          localStorage.removeItem('token')
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    } else {
+      setLoading(false)
     }
-    setLoading(false)
   }, [])
 
   const login = async (email, password) => {
     try {
-      // Replace with actual API call
-      if (email === 'admin@moroccoin.com' && password === 'admin123') {
-        const token = 'fake-jwt-token'
-        localStorage.setItem('token', token)
-        setIsAuthenticated(true)
-        setUser({ name: 'Admin User', email })
-        return { success: true }
-      }
-      return { success: false, error: 'Invalid credentials' }
+      const response = await authAPI.login({ email, password })
+      const { token, user } = response.data
+      localStorage.setItem('token', token)
+      setIsAuthenticated(true)
+      setUser(user)
+      return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      return { success: false, error: error.response?.data?.message || 'Login failed' }
     }
   }
 

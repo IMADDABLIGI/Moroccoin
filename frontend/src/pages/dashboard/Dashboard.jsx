@@ -1,21 +1,41 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Users, CreditCard, TrendingUp, DollarSign, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { dashboardAPI } from '../../services/api'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
-    totalUsers: 1250,
-    totalTransactions: 3420,
-    totalVolume: 2450000,
-    pendingRefunds: 12
+    totalUsers: 0,
+    totalTransactions: 0,
+    totalVolume: 0,
+    pendingRefunds: 0
   })
+  const [recentTransactions, setRecentTransactions] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const [recentTransactions, setRecentTransactions] = useState([
-    { id: 'TXN001', user: 'Ahmed Hassan', amount: 500, status: 'completed', date: '2024-01-15' },
-    { id: 'TXN002', user: 'Fatima Zahra', amount: 1200, status: 'pending', date: '2024-01-15' },
-    { id: 'TXN003', user: 'Omar Benali', amount: 800, status: 'completed', date: '2024-01-14' },
-    { id: 'TXN004', user: 'Aicha Alami', amount: 300, status: 'failed', date: '2024-01-14' },
-  ])
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await dashboardAPI.getStats()
+        setStats(response.data.stats)
+        setRecentTransactions(response.data.recentTransactions)
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboardData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +123,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
             <Link 
-              to="/transactions" 
+              to="/transactions"
               className="text-primary hover:text-primary-dark text-sm font-medium"
             >
               View all
@@ -133,19 +153,19 @@ export default function Dashboard() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50">
+                <tr key={transaction._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {transaction.id}
+                    {transaction.transactionId}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {transaction.user}
+                    {transaction.senderName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${transaction.amount}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      transaction.status === 'completed' 
+                      transaction.status === 'completed'
                         ? 'bg-green-100 text-green-800'
                         : transaction.status === 'pending'
                         ? 'bg-yellow-100 text-yellow-800'
@@ -155,7 +175,7 @@ export default function Dashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {transaction.date}
+                    {new Date(transaction.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

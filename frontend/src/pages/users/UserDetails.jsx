@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard, DollarSign, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
+import { usersAPI, transactionsAPI } from '../../services/api'
 
 export default function UserDetails() {
   const { id } = useParams()
@@ -9,49 +10,31 @@ export default function UserDetails() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setUser({
-        id: parseInt(id),
-        name: 'Ahmed Hassan',
-        email: 'ahmed.hassan@email.com',
-        phone: '+212 6 12 34 56 78',
-        status: 'active',
-        joinDate: '2023-06-15',
-        lastActivity: '2024-01-15',
-        address: 'Casablanca, Morocco',
-        idNumber: 'BE123456',
-        totalTransactions: 15,
-        totalAmount: 7500,
-        successfulTransactions: 13,
-        failedTransactions: 2
-      })
-      
-      setTransactions([
-        { id: 'TXN001', amount: 500, status: 'completed', date: '2024-01-15', recipient: 'Fatima Zahra' },
-        { id: 'TXN002', amount: 1200, status: 'pending', date: '2024-01-14', recipient: 'Omar Benali' },
-        { id: 'TXN003', amount: 800, status: 'completed', date: '2024-01-13', recipient: 'Aicha Alami' },
-        { id: 'TXN004', amount: 300, status: 'failed', date: '2024-01-12', recipient: 'Hassan Alaoui' },
-        { id: 'TXN005', amount: 600, status: 'completed', date: '2024-01-11', recipient: 'Khadija Bennani' }
-      ])
-      
-      setLoading(false)
-    }, 1000)
+    const fetchUserData = async () => {
+      try {
+        const [userResponse, transactionsResponse] = await Promise.all([
+          usersAPI.getUser(id),
+          transactionsAPI.getTransactions({ userId: id })
+        ])
+        setUser(userResponse.data)
+        setTransactions(transactionsResponse.data)
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
   }, [id])
 
-  const handleRefund = (transactionId) => {
-    // Implement refund logic
-    alert(`Refund initiated for transaction ${transactionId}`)
-  }
-
-  const handleSendEmail = () => {
-    // Implement email sending logic
-    alert('Email sent to user')
-  }
-
-  const handleSendSMS = () => {
-    // Implement SMS sending logic
-    alert('SMS sent to user')
+  const handleRefund = async (transactionId) => {
+    try {
+      await transactionsAPI.refundTransaction(transactionId)
+      alert(`Refund initiated for transaction ${transactionId}`)
+    } catch (error) {
+      alert('Error initiating refund')
+    }
   }
 
   if (loading) {
@@ -76,28 +59,22 @@ export default function UserDetails() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link 
-            to="/users" 
+            to="/users"
             className="p-2 hover:bg-gray-100 rounded-full"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-            <p className="text-gray-500">User ID: {user.id}</p>
+            <p className="text-gray-500">User ID: {user._id}</p>
           </div>
         </div>
         <div className="flex space-x-2">
-          <button
-            onClick={handleSendEmail}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             <Mail className="h-4 w-4 mr-2" />
             Send Email
           </button>
-          <button
-            onClick={handleSendSMS}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-          >
+          <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
             <Phone className="h-4 w-4 mr-2" />
             Send SMS
           </button>
@@ -110,37 +87,34 @@ export default function UserDetails() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Transactions</p>
-              <p className="text-2xl font-bold text-gray-900">{user.totalTransactions}</p>
+              <p className="text-2xl font-bold text-gray-900">{user.totalTransactions || 0}</p>
             </div>
             <CreditCard className="h-8 w-8 text-primary" />
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Amount</p>
-              <p className="text-2xl font-bold text-gray-900">${user.totalAmount.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">${(user.totalAmount || 0).toLocaleString()}</p>
             </div>
             <DollarSign className="h-8 w-8 text-green-600" />
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Successful</p>
-              <p className="text-2xl font-bold text-green-600">{user.successfulTransactions}</p>
+              <p className="text-2xl font-bold text-green-600">{user.successfulTransactions || 0}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Failed</p>
-              <p className="text-2xl font-bold text-red-600">{user.failedTransactions}</p>
+              <p className="text-2xl font-bold text-red-600">{user.failedTransactions || 0}</p>
             </div>
             <XCircle className="h-8 w-8 text-red-600" />
           </div>
@@ -171,16 +145,16 @@ export default function UserDetails() {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Join Date</label>
-                <p className="text-sm text-gray-900">{user.joinDate}</p>
+                <p className="text-sm text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Last Activity</label>
-                <p className="text-sm text-gray-900">{user.lastActivity}</p>
+                <p className="text-sm text-gray-900">{new Date(user.lastActivity).toLocaleDateString()}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Status</label>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  user.status === 'active' 
+                  user.status === 'active'
                     ? 'bg-green-100 text-green-800'
                     : 'bg-red-100 text-red-800'
                 }`}>
@@ -190,7 +164,6 @@ export default function UserDetails() {
             </div>
           </div>
         </div>
-
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
@@ -222,24 +195,24 @@ export default function UserDetails() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {transactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-50">
+                    <tr key={transaction._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <Link 
-                          to={`/transactions/${transaction.id}`}
+                        <Link
+                          to={`/transactions/${transaction._id}`}
                           className="text-primary hover:text-primary-dark"
                         >
-                          {transaction.id}
+                          {transaction.transactionId}
                         </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         ${transaction.amount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {transaction.recipient}
+                        {transaction.recipientName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          transaction.status === 'completed' 
+                          transaction.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : transaction.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
@@ -249,12 +222,12 @@ export default function UserDetails() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {transaction.date}
+                        {new Date(transaction.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         {transaction.status === 'completed' && (
                           <button
-                            onClick={() => handleRefund(transaction.id)}
+                            onClick={() => handleRefund(transaction._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             Refund

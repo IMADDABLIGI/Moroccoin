@@ -1,29 +1,12 @@
-# 🪙 Moroccoin - Admin Dashboard
+# React + Vite
 
-A modern, responsive admin dashboard for Moroccoin money wiring platform built with React and Tailwind CSS.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 Features
+Currently, two official plugins are available:
 
-- **Authentication System** - Secure login/logout functionality
-- **User Management** - View, search, and manage users
-- **Transaction Monitoring** - Track all transactions and their statuses
-- **Communication Tools** - Send emails and SMS to users
-- **Live Chat Support** - Real-time chat with customers
-- **Responsive Design** - Works on all devices
-- **Modern UI** - Clean and intuitive interface with purple theme
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 🛠️ Tech Stack
+## Expanding the ESLint configuration
 
-- **Frontend**: React 18 + Vite
-- **Styling**: Tailwind CSS (via CDN)
-- **Routing**: React Router DOM
-- **Icons**: Lucide React
-- **HTTP Client**: Axios
-- **State Management**: React Context API
-
-## 📦 Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd moroccoin-frontend
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

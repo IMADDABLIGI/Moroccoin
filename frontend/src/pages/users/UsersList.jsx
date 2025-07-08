@@ -1,64 +1,36 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Filter, Eye, Mail, Phone } from 'lucide-react'
+import { usersAPI } from '../../services/api'
 
 export default function UsersList() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: 'Ahmed Hassan',
-      email: 'ahmed.hassan@email.com',
-      phone: '+212 6 12 34 56 78',
-      status: 'active',
-      totalTransactions: 15,
-      totalAmount: 7500,
-      joinDate: '2023-06-15',
-      lastActivity: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Fatima Zahra',
-      email: 'fatima.zahra@email.com',
-      phone: '+212 6 87 65 43 21',
-      status: 'active',
-      totalTransactions: 8,
-      totalAmount: 4200,
-      joinDate: '2023-08-22',
-      lastActivity: '2024-01-14'
-    },
-    {
-      id: 3,
-      name: 'Omar Benali',
-      email: 'omar.benali@email.com',
-      phone: '+212 6 55 44 33 22',
-      status: 'suspended',
-      totalTransactions: 3,
-      totalAmount: 1500,
-      joinDate: '2023-11-10',
-      lastActivity: '2024-01-10'
-    },
-    {
-      id: 4,
-      name: 'Aicha Alami',
-      email: 'aicha.alami@email.com',
-      phone: '+212 6 99 88 77 66',
-      status: 'active',
-      totalTransactions: 22,
-      totalAmount: 12300,
-      joinDate: '2023-03-05',
-      lastActivity: '2024-01-15'
-    }
-  ])
-
+  const [users, setUsers] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await usersAPI.getUsers({ search: searchTerm, status: statusFilter })
+        setUsers(response.data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUsers()
+  }, [searchTerm, statusFilter])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -130,12 +102,12 @@ export default function UsersList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+              {users.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      <div className="text-sm text-gray-500">ID: {user.id}</div>
+                      <div className="text-sm text-gray-500">ID: {user._id}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -144,7 +116,7 @@ export default function UsersList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.status === 'active' 
+                      user.status === 'active'
                         ? 'bg-green-100 text-green-800'
                         : user.status === 'suspended'
                         ? 'bg-red-100 text-red-800'
@@ -154,18 +126,18 @@ export default function UsersList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.totalTransactions}
+                    {user.totalTransactions || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${user.totalAmount.toLocaleString()}
+                    ${(user.totalAmount || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.lastActivity}
+                    {new Date(user.lastActivity).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        to={`/users/${user.id}`}
+                        to={`/users/${user._id}`}
                         className="text-primary hover:text-primary-dark"
                       >
                         <Eye className="h-4 w-4" />
@@ -185,7 +157,7 @@ export default function UsersList() {
         </div>
       </div>
 
-      {filteredUsers.length === 0 && (
+      {users.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-500">No users found matching your criteria.</div>
         </div>

@@ -1,19 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Filter, Eye } from 'lucide-react'
+import { transactionsAPI } from '../../services/api'
 
 export default function TransactionsList() {
-  const [transactions] = useState([
-    { id: 'TXN001', user: 'Ahmed Hassan', amount: 500, status: 'completed', date: '2024-01-15', recipient: 'Fatima Zahra' },
-    { id: 'TXN002', user: 'Fatima Zahra', amount: 1200, status: 'pending', date: '2024-01-15', recipient: 'Omar Benali' },
-    { id: 'TXN003', user: 'Omar Benali', amount: 800, status: 'completed', date: '2024-01-14', recipient: 'Aicha Alami' },
-    { id: 'TXN004', user: 'Aicha Alami', amount: 300, status: 'failed', date: '2024-01-14', recipient: 'Hassan Alaoui' },
-  ])
+  const [transactions, setTransactions] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await transactionsAPI.getTransactions()
+        setTransactions(response.data)
+      } catch (error) {
+        console.error('Error fetching transactions:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTransactions()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-      
       <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -29,9 +48,9 @@ export default function TransactionsList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {transactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.user}</td>
+                <tr key={transaction._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.transactionId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.senderName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${transaction.amount}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -41,9 +60,9 @@ export default function TransactionsList() {
                       {transaction.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(transaction.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link to={`/transactions/${transaction.id}`} className="text-primary hover:text-primary-dark">
+                    <Link to={`/transactions/${transaction._id}`} className="text-primary hover:text-primary-dark">
                       <Eye className="h-4 w-4" />
                     </Link>
                   </td>
