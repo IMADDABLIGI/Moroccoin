@@ -1,27 +1,47 @@
-# 🪙 MoroccoCoin - Money Wiring Platform
+# 🪙 Moroccoin - Fullstack Admin Dashboard
 
-A fullstack web application for managing money transfers with an admin dashboard for customer support and business reporting.
+A modern, responsive admin dashboard for Moroccoin money wiring platform built with React frontend and Flask backend with MongoDB Atlas.
 
 ## 🚀 Features
 
-- **User Management**: View and manage user accounts
-- **Transaction Tracking**: Monitor all money transfers
-- **Customer Support**: Handle support tickets and chat with users
-- **Business Intelligence**: Generate reports and insights
-- **Refund Processing**: Process refunds for completed transactions
-- **Communication**: Send SMS and email notifications
+### Frontend (React + Vite)
+- **Authentication System** - Secure login/logout functionality
+- **User Management** - View, search, and manage users
+- **Transaction Monitoring** - Track all transactions and their statuses
+- **Communication Tools** - Send emails and SMS to users
+- **Live Chat Support** - Real-time chat with customers
+- **Responsive Design** - Works on all devices
+- **Modern UI** - Clean and intuitive interface with purple theme
 
-## 🛠 Tech Stack
+### Backend (Flask + MongoDB)
+- **RESTful API** - Clean API endpoints for all operations
+- **MongoDB Atlas** - Cloud database with Moroccan sample data
+- **JWT Authentication** - Secure token-based authentication
+- **CORS Support** - Cross-origin resource sharing enabled
+- **Data Models** - User, Transaction, and Chat models
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **React** with Vite
-- **Tailwind CSS** (via CDN)
-- **JavaScript**
-- **Responsive Design**
+- **React 18** + **Vite** - Modern React development
+- **Tailwind CSS** - Utility-first CSS framework (via CDN)
+- **React Router DOM** - Client-side routing
+- **Lucide React** - Beautiful icons
+- **Axios** - HTTP client for API calls
 
 ### Backend
-- **Django** with Django REST Framework
-- **SQLite** Database
-- **CORS** enabled for frontend communication
+- **Flask** - Python web framework
+- **MongoDB Atlas** - Cloud NoSQL database
+- **PyMongo** - MongoDB driver for Python
+- **Flask-CORS** - Cross-origin resource sharing
+- **JWT** - JSON Web Tokens for authentication
+- **BCrypt** - Password hashing
 
-## 📁 Project Structure
+## 📦 Installation & Setup
+
+### Prerequisites
+- Node.js (v16 or higher)
+- Python (v3.8 or higher)
+- MongoDB Atlas account (connection string provided)
+
+
