@@ -3,14 +3,17 @@ from app.models.user import User
 from app.models.transaction import Transaction
 import json
 from bson import ObjectId
+from datetime import datetime
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
 class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        return json.JSONEncoder.default(self, o)
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
 
 @dashboard_bp.route('/stats', methods=['GET'])
 def get_dashboard_stats():
@@ -35,6 +38,7 @@ def get_dashboard_stats():
         # Get recent transactions
         recent_transactions = transaction_model.get_recent_transactions(5)
         
+
         # Add user names to recent transactions
         for transaction in recent_transactions:
             if 'senderId' in transaction:
@@ -54,4 +58,5 @@ def get_dashboard_stats():
         return json.dumps(stats, cls=JSONEncoder), 200, {'Content-Type': 'application/json'}
     
     except Exception as e:
+        print("Error fetching dashboard stats:", str(e))
         return jsonify({'message': 'Failed to fetch dashboard stats', 'error': str(e)}), 500

@@ -2,14 +2,17 @@ from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime
 import json
 from bson import ObjectId
+from datetime import datetime
 
 chat_bp = Blueprint('chat', __name__)
 
 class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        return json.JSONEncoder.default(self, o)
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
 
 @chat_bp.route('/<user_id>/messages', methods=['GET'])
 def get_messages(user_id):

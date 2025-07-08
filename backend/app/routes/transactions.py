@@ -3,15 +3,18 @@ from app.models.transaction import Transaction
 from app.models.user import User
 from bson import ObjectId
 import json
+from datetime import datetime
 
 transactions_bp = Blueprint('transactions', __name__)
 
 class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        return json.JSONEncoder.default(self, o)
-
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
+    
 @transactions_bp.route('', methods=['GET'])
 def get_transactions():
     try:
