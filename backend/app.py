@@ -3,6 +3,7 @@ import os
 
 app = create_app()
 
+
 if __name__ == '__main__':
     # Check if we're in production
     if os.environ.get('FLASK_ENV') == 'production':
